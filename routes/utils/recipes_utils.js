@@ -37,9 +37,45 @@ async function getRecipeDetails(recipe_id) {
     }
 }
 
-
+// async function getRecipesData(recipe){
+//     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe;
+//     return {
+//         id: id,
+//         title: title,
+//         readyInMinutes: readyInMinutes,
+//         image: image,
+//         popularity: aggregateLikes,
+//         vegan: vegan,
+//         glutenFree: glutenFree,
+//         already:already,
+//         saved:saved,
+//         ingredients : ingredients, 
+//         instructions:instructions,
+//         meals:meals
+//       }
+//     }
+    
+//}
+async function getRandom(){
+    let recipe= await axios.get(`${api_domain}/random`, {
+        params: {
+            number: 1,
+            limitLicense:true,
+            tags: 'vegetarian',
+            apiKey: process.env.spooncular_apiKey
+        }
+    });
+    console.log(recipe.json.id)
+    return recipe.json.id;
+    // let randomRecipes = [];
+    // for(let i=0;i<3;i++){
+    //     randomRecipes[i] = getRecipesData(recipes[i]);
+    // }
+    // return randomRecipes;
+}
 
 exports.getRecipeDetails = getRecipeDetails;
-
+exports.getRandom = getRandom;
+//exports.getRecipesData = getRecipesData;
 
 
