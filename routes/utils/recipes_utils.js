@@ -13,31 +13,15 @@ const api_domain = "https://api.spoonacular.com/recipes";
 async function getRandom(){
     let recipe= await axios.get(`${api_domain}/random`, {
         params: {
-            number: 1,
+            number: 3,
             apiKey: process.env.spooncular_apiKey
         }
     });
-    return recipe;
+    return recipe.data.recipes;
 }
 
 
-
-async function search(query, number) {
-    let recipes= await axios.get(`${api_domain}/complexSearch`, {
-        params: {
-            number: number,
-            query: query,
-            // cuisine: cuisine,
-            // diet: diet,
-            // intolerances: intolerances,
-            instructionsRequired: true,
-            apiKey: process.env.spooncular_apiKey
-        }
-    });
-    return recipes;
-}
-
-async function getRecipeInformation(recipe_id) {
+    async function getRecipeInformation(recipe_id) {
     return await axios.get(`${api_domain}/${recipe_id}/information`, {
         params: {
             includeNutrition: false,
@@ -45,6 +29,25 @@ async function getRecipeInformation(recipe_id) {
         }
     });
 }
+
+async function search(query, number, cuisine, diet, intolerances, sort) {
+    console.log(query, number)
+    let recipes= await axios.get(` https://api.spoonacular.com/recipes/complexSearch`, {
+        params: {
+            number: number,
+            query: query,
+            cuisine: cuisine,
+            diet: diet,
+            intolerances: intolerances,
+            sort: sort,
+            instructionsRequired: true,
+            apiKey: process.env.spooncular_apiKey
+        }
+    });
+    return recipes.data.results;
+}
+
+
 
 
 

@@ -26,7 +26,6 @@ router.use(async function (req, res, next) {
  * This path gets body with recipeId and save this recipe in the favorites list of the logged-in user
  */
 router.post('/favorites', async (req,res,next) => {
-  console.log(req.session.user_id)
   try{
     const user_id = req.session.user_id;
    
@@ -81,7 +80,6 @@ router.get("/myRecipes", async (req,res,next)=>{
   try{
     const user_id = req.session.user_id;
     const recipes = await user_utils.getMyRecipes(user_id);
-    console.log(recipes);
     const jsonArray = recipes.map((row) => {
       return {
         recipe_id: row.recipe_id,
@@ -110,7 +108,6 @@ router.get("/myFamilyRecipes", async (req,res,next)=>{
   try{
     const user_id = req.session.user_id;
     const recipes = await user_utils.getMyFamilyRecipes(user_id);
-    console.log(recipes);
     const jsonArray = recipes.map((row) => {
       return {
         recipe_id: row.recipe_id,
