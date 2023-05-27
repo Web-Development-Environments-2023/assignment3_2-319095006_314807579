@@ -71,7 +71,7 @@ router.post("/newRecipe", async (req, res, next) => { // it is written in the do
       }
       const user_id = req.session.user_id;
       await user_utils.createRecipe(recipe_details,user_id)
-      res.status(200).send("The Recipe successfully saved in your recipes");
+      res.status(201).send("The Recipe successfully saved in your recipes");
       }catch(error){
         next(error)
     }
@@ -81,14 +81,65 @@ router.get("/myRecipes", async (req,res,next)=>{
   try{
     const user_id = req.session.user_id;
     const recipes = await user_utils.getMyRecipes(user_id);
-    // let recipes_id_array = [];
-    // recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    // const results = await recipe_utils.getRecipesData(recipes_id_array); //--- CHANGED BY US
+    console.log(recipes);
+    const jsonArray = recipes.map((row) => {
+      return {
+        recipe_id: row.recipe_id,
+        image: row.image,
+        name: row.name,
+        time: row.time,
+        vegan: row.vegan,
+        gluten_free: row.gluten_free,
+        likes: row.likes,
+        saved: row.saved,
+        already: row.already,
+        ingredients: row.ingredients,
+        instructions: row.instructions,
+        meals: row.meals
+      };
+    });
     res.status(200).send(recipes);
   }catch(error){
     next(error)
   }
 })
+
+
+
+router.get("/myFamilyRecipes", async (req,res,next)=>{
+  try{
+    const user_id = req.session.user_id;
+    const recipes = await user_utils.getMyFamilyRecipes(user_id);
+    console.log(recipes);
+    const jsonArray = recipes.map((row) => {
+      return {
+        recipe_id: row.recipe_id,
+        user_id: row.user_id,
+        name: row.name,
+        time: row.time,
+        ingredients: row.ingredients,
+        instructions: row.instructions,
+        holiday: row.holiday,
+        family_member: row.family_member,
+        image: row.image
+      };
+    });
+    res.status(200).send(recipes);
+  }catch(error){
+    next(error)
+  }
+});
+
+
+router.get("/:recipeId", async (req, res, next) => {
+  try {
+    const recipe = await user_utils.getFullRecipeDetails(req.params.recipeId);
+    res.status(200).send(recipe);
+  } 
+  catch(error){
+    next(error);
+  }
+});
 
 
 
