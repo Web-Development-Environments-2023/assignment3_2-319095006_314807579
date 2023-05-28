@@ -8,6 +8,8 @@ router.get("/", (req, res) => res.send("im here"));
 router.get("/getRandomRecipes",async (req,res,next)=>{
   try{
     const randomRec = await recipes_utils.getRandom();
+    //check for user id
+    const user_id = req.session.user_id;
     //we want to take only id from the recipe object
     const jsonArray = randomRec.map((row) => {
       return {
@@ -16,7 +18,7 @@ router.get("/getRandomRecipes",async (req,res,next)=>{
     });
     //iterate through jsonArray and get the full details of each recipe
     for (let i = 0; i < jsonArray.length; i++) {
-      const recipe = await recipes_utils.getRecipeDetails(jsonArray[i].recipe_id);
+      const recipe = await recipes_utils.getRecipeDetails(jsonArray[i].recipe_id, user_id);
       jsonArray[i] = recipe;
     }
 
@@ -34,6 +36,7 @@ router.get("/getRandomRecipes",async (req,res,next)=>{
 
 router.get("/search", async (req, res, next) => {
   try{
+    const user_id = req.session.user_id;
     const query = req.query.query;
     const number = req.query.number;
     const cuisine = req.query.cuisine;
@@ -49,7 +52,7 @@ router.get("/search", async (req, res, next) => {
     });
     //iterate through jsonArray and get the full details of each recipe
     for (let i = 0; i < jsonArray.length; i++) {
-      const recipe = await recipes_utils.getRecipeDetails(jsonArray[i].recipe_id);
+      const recipe = await recipes_utils.getRecipeDetails(jsonArray[i].recipe_id, user_id);
       jsonArray[i] = recipe;
     }
 

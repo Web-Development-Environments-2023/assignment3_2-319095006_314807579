@@ -47,12 +47,13 @@ router.get('/favorites', async (req,res,next) => {
     const recipes_id = await user_utils.getFavoriteRecipes(user_id);
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
-    const results = await recipe_utils.getRecipeDetails(recipes_id_array); //--- CHANGED BY US
+    const results = await recipe_utils.getRecipeDetails(recipes_id_array, user_id); //--- CHANGED BY US
     res.status(200).send(results);
   } catch(error){
     next(error); 
   }
 });
+
 router.post("/newRecipe", async (req, res, next) => { // it is written in the document to open a modal, but i made it like register for now.
   try {
       let recipe_details = {
@@ -111,7 +112,7 @@ router.get("/lastViewed", async (req,res,next)=>{
     //get details for each of the ids in recipes
     for (let i = 0; i < recipes.length; i++) {
       if (recipes[i].source == 1){
-        const recipe = await recipe_utils.getRecipeDetails(recipes[i].recipe_id);
+        const recipe = await recipe_utils.getRecipeDetails(recipes[i].recipe_id, user_id);
         recipes[i] = recipe;
       }
       else{

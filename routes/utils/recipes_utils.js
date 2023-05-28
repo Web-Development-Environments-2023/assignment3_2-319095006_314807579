@@ -1,5 +1,6 @@
 const axios = require("axios");
 const api_domain = "https://api.spoonacular.com/recipes";
+const DButils = require("./DButils");
 
 
 
@@ -54,8 +55,21 @@ async function search(query, number, cuisine, diet, intolerances, sort) {
 
 
 
-async function getRecipeDetails(recipe_id) {
+async function getRecipeDetails(recipe_id, user_id) {
+    let already = false;
+    let saved = false;
+    if (user_id) {
+        //check if the recipe is in lastviewed table with source 1
+        let fave = await DButils.execQuery(`select recipe_id, source from FavoriteRecipes where user_id='${user_id}' and recipe_id='${recipe_id}'`);
+        let recipe = await DButils.execQuery(`select recipe_id, source from lastviewed where user_id='${user_id}' and recipe_id='${recipe_id}' and source=1`);
+        if (recipe.length > 0) {
+             already = true;}
+        if (fave.length > 0) {
+            saved = true;}
+}
+
     let recipe_info = await getRecipeInformation(recipe_id);
+    //check if the recipe is in lastviewed table with source 1
     let { id, title, readyInMinutes, image, aggregateLikes, vegan, vegetarian, glutenFree } = recipe_info.data;
 
     return {
@@ -66,7 +80,9 @@ async function getRecipeDetails(recipe_id) {
         popularity: aggregateLikes,
         vegan: vegan,
         vegetarian: vegetarian,
-        glutenFree: glutenFree
+        glutenFree: glutenFree,
+        already: already,
+        saved: saved
     }
 }
 
