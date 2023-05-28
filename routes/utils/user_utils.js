@@ -2,6 +2,7 @@ const DButils = require("./DButils");
 
 async function markAsFavorite(user_id, recipe_id){
     await DButils.execQuery(`insert into FavoriteRecipes values ('${user_id}',${recipe_id})`);
+    await DButils.execQuery(`update myrecipes set saved='true' where recipe_id='${recipe_id}' and user_id='${user_id}'`);
 }
 
 async function getFavoriteRecipes(user_id){
@@ -20,10 +21,9 @@ async function getMyFamilyRecipes(user_id){
 }
 
 async function createRecipe(recipe_details,user_id){
+    console.log(recipe_details);
     await DButils.execQuery(
-    `INSERT INTO myrecipes VALUES ('${user_id}',NULL,'${recipe_details.image}', '${recipe_details.name}', '${recipe_details.time}',
-    '${recipe_details.likes}', '${recipe_details.vegan}', '${recipe_details.gluten_free}','${recipe_details.already}','${recipe_details.saved}',
-    '${recipe_details.ingredients}','${recipe_details.instructions}','${recipe_details.meals}')`);
+    `INSERT INTO myrecipes VALUES ('${user_id}',NULL,'${recipe_details.image}', '${recipe_details.name}', '${recipe_details.time}', 0, '${recipe_details.vegan}', '${recipe_details.gluten_free}','false', 'false','${recipe_details.ingredients}','${recipe_details.instructions}','${recipe_details.meals}', '${recipe_details.vegeterian}')`);
 }
 
 
@@ -32,7 +32,6 @@ async function getFullRecipeDetails(recipeId) {
     const recipe = await DButils.execQuery(
         `select * from myrecipes where recipe_id='${recipeId}'`
     );
-
     return recipe;
 }
 
@@ -46,7 +45,7 @@ async function getMyRecipeDetails(recipe_id)
 }
 
 async function getLastViewed(user_id) {
-    const recipes = await DButils.execQuery(`select recipe_id, source from lastviewed where user_id='${user_id}'`);
+    const recipes = await DButils.execQuery(`select recipe_id, source from lastviewed where user_id='${user_id}' order by asc limit 3`);
     return recipes;
 }
 
@@ -69,10 +68,10 @@ async function addLastViewed(user_id, recipeId, source)
             return;
         }
     }
-    if(recipes.length>=3){
-        await DButils.execQuery(`delete from lastviewed where user_id='${user_id}' and recipe_id='${recipes[0].recipe_id}'`);
-        console.log("deleted oldest recipe with recipeid "+recipes[0].recipe_id+" from lastviewed");
-    }
+    // if(recipes.length>=3){
+    //     await DButils.execQuery(`delete from lastviewed where user_id='${user_id}' and recipe_id='${recipes[0].recipe_id}'`);
+    //     console.log("deleted oldest recipe with recipeid "+recipes[0].recipe_id+" from lastviewed");
+    // }
     await DButils.execQuery(`insert into lastviewed values ('${user_id}',${recipeId}, NOW(), '${source}')`);
 }
 
