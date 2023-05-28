@@ -30,6 +30,9 @@ async function getRandom(){
     });
 }
 
+
+
+
 async function search(query, number, cuisine, diet, intolerances, sort) {
     console.log(query, number)
     let recipes= await axios.get(` https://api.spoonacular.com/recipes/complexSearch`, {

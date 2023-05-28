@@ -103,6 +103,31 @@ router.get("/myRecipes", async (req,res,next)=>{
 })
 
 
+router.get("/lastViewed", async (req,res,next)=>{
+  try {
+    const user_id= req.session.user_id;
+    const recipes = await user_utils.getLastViewed(user_id);
+    //get details for each of the ids in recipes
+    for (let i = 0; i < recipes.length; i++) {
+      if (recipes[i].source == 1){
+        const recipe = await recipe_utils.getRecipeDetails(recipes[i].recipe_id);
+        recipes[i] = recipe;
+      }
+      else{
+         const recipe = await user_utils.getMyRecipeDetails(recipes[i].recipe_id);
+         recipes[i] = recipe;
+      }
+    }
+    res.status(200).send(recipes);
+  } catch (error) {
+    next(error);
+    
+
+  }
+})
+
+
+
 
 router.get("/myFamilyRecipes", async (req,res,next)=>{
   try{
@@ -131,6 +156,9 @@ router.get("/myFamilyRecipes", async (req,res,next)=>{
 router.get("/:recipeId", async (req, res, next) => {
   try {
     const recipe = await user_utils.getFullRecipeDetails(req.params.recipeId);
+    if (req.session && req.session.user_id) {
+      await user_utils.addLastViewed(req.session.user_id, req.params.recipeId, 0);
+    }
     res.status(200).send(recipe);
   } 
   catch(error){
