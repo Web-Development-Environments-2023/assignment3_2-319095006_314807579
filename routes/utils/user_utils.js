@@ -45,34 +45,52 @@ async function getMyRecipeDetails(recipe_id)
 }
 
 async function getLastViewed(user_id) {
-    const recipes = await DButils.execQuery(`select recipe_id, source from lastviewed where user_id='${user_id}' order by asc limit 3`);
+    const recipes = await DButils.execQuery(`select recipe_id from lastviewed where user_id='${user_id}' order by time desc limit 3`);
     return recipes;
+}
+
+async function checkFavorite(user_id, recipe_id) {
+    let fave = await DButils.execQuery(`select recipe_id from FavoriteRecipes where user_id='${user_id}' and recipe_id='${recipe_id}'`);
+    if (fave.length > 0)
+    {
+        return true;
+    }
+    return false;
+    
+}
+async function checkViewed(user_id, recipe_id) {
+    let recipe = await DButils.execQuery(`select recipe_id from lastviewed where user_id='${user_id}' and recipe_id='${recipe_id}'`);
+    if (recipe.length > 0)
+    {
+        return true;
+    }
+    return false;
 }
 
 
 
 
-async function addLastViewed(user_id, recipeId, source)
+async function addLastViewed(user_id, recipeId)
 {
-    //check if there are already three recipes with the user_id and delete the oldest one
-    const recipes = await DButils.execQuery(`select recipe_id, source from lastviewed where user_id='${user_id}' order by time asc`);
-    //check in recipes if already in the recipes with the same recipe_id and source
+    //check if there are already three recipes with the user_id 
+    const recipes = await DButils.execQuery(`select recipe_id from lastviewed where user_id='${user_id}' order by time asc`);
+    //check in recipes if already in the recipes with the same recipe_id 
     for (let i = 0; i < recipes.length; i++) {
-        if(recipes[i].recipe_id==recipeId && recipes[i].source==source){
-            //delete the recipe from the table
-            await DButils.execQuery(`delete from lastviewed where user_id='${user_id}' and recipe_id='${recipeId}' and source='${source}'`);
-            console.log("deleted recipe with recipeid "+recipeId+" and source "+source+" from lastviewed");
-            //add the recipe with the updated time
-            await DButils.execQuery(`insert into lastviewed values ('${user_id}',${recipeId}, NOW(), '${source}')`);
-            console.log("added recipe a second time with recipeid "+recipeId+" and source "+source+" to lastviewed");
+        if(recipes[i].recipe_id==recipeId){
+            await DButils.execQuery(`delete from lastviewed where user_id='${user_id}' and recipe_id='${recipeId}'`);
+            await DButils.execQuery(`insert into lastviewed values ('${user_id}',${recipeId}, NOW())`);
             return;
         }
     }
-    // if(recipes.length>=3){
-    //     await DButils.execQuery(`delete from lastviewed where user_id='${user_id}' and recipe_id='${recipes[0].recipe_id}'`);
-    //     console.log("deleted oldest recipe with recipeid "+recipes[0].recipe_id+" from lastviewed");
-    // }
-    await DButils.execQuery(`insert into lastviewed values ('${user_id}',${recipeId}, NOW(), '${source}')`);
+    await DButils.execQuery(`insert into lastviewed values ('${user_id}',${recipeId}, NOW())`);
+}
+
+
+
+async function changeLastViewed(user_id, recipeId)
+{
+    //change the field already in the table myrecipes to true
+    await DButils.execQuery(`update myrecipes set already='true' where user_id='${user_id}' and recipe_id='${recipeId}'`);
 }
 
 exports.markAsFavorite = markAsFavorite;
@@ -84,3 +102,6 @@ exports.getFullRecipeDetails=getFullRecipeDetails;
 exports.getLastViewed=getLastViewed;
 exports.addLastViewed=addLastViewed;
 exports.getMyRecipeDetails=getMyRecipeDetails;
+exports.changeLastViewed=changeLastViewed;
+exports.checkFavorite=checkFavorite;
+exports.checkViewed=checkViewed;

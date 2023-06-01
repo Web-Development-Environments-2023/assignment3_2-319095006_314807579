@@ -38,24 +38,24 @@ router.get("/search", async (req, res, next) => {
   try{
     const user_id = req.session.user_id;
     const query = req.query.query;
-    const number = req.query.number;
+    const number = req.query.number || 5;
     const cuisine = req.query.cuisine;
     const diet = req.query.diet;
     const intolerances = req.query.intolerances;
     const sort = req.query.sort;
     const recipes = await recipes_utils.search(query, number, cuisine, diet, intolerances, sort);
-    //retrun only id of the recipes 
     const jsonArray = recipes.map((row) => {
       return {
         recipe_id: row.id,
       }
     });
-    //iterate through jsonArray and get the full details of each recipe
+    if (jsonArray.length == 0) {
+      res.status(200).send("No recipes found");
+    }
     for (let i = 0; i < jsonArray.length; i++) {
       const recipe = await recipes_utils.getRecipeDetails(jsonArray[i].recipe_id, user_id);
       jsonArray[i] = recipe;
     }
-
     res.status(200).send(jsonArray);
   }
   catch(error){
@@ -68,7 +68,7 @@ router.get("/:recipeId", async (req, res, next) => {
   try {
     const recipe = await recipes_utils.getFullRecipeDetails(req.params.recipeId);
     if (req.session && req.session.user_id) {
-      await user_utils.addLastViewed(req.session.user_id, req.params.recipeId, 1);
+      await user_utils.addLastViewed(req.session.user_id, req.params.recipeId);
     }
 
     res.send(recipe);

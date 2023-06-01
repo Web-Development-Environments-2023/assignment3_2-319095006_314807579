@@ -142,7 +142,7 @@ components:
           maxLength: 8
           minLength: 3
           type: string
-          description: username conatins between 3 to 8 letters only
+          description: username contains between 3 to 8 letters only
           example: my_name
         firstname:
           type: string

@@ -7,10 +7,7 @@ connectionLimit:4,
   host: process.env.host,//"localhost"
   user: process.env.user,//"root"
   password: process.env.password,
-  // host:'localhost',
-  // user:'root',
-  // password:'Amit0506',
-  database:"mydb"
+  database: process.env.database
 }
 const pool = new mysql.createPool(config);
 
