@@ -133,6 +133,180 @@ paths:
                 $ref: '#/components/schemas/RecipePreview'
         "404":
           description: recipeId is not exists
+  /users/newRecipe:
+    post:
+      tags:
+      - Users
+      summary: save a new recipe in the user's my recipes
+      description: save a new recipe in the user's myrecipes table
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: integer
+                  description: reciepe's id which the user saved
+                  example: 716429
+      responses:
+        "201":
+          description: The Recipe successfully saved in your recipes
+        "401":
+          description: user is not authorized
+  /users/myRecipes:
+    get:
+      tags:
+      - Users
+      summary: Return the recipes that were created by the user
+      description: Get an array of recipes that were created by the logged in user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: user is not authorized
+  /users/lastViewed:
+    get:
+      tags:
+      - Users
+      summary: Return the 3 last recipes that the user viewed
+      description: Get an array of 3 recipes that were viewed by the logged in user
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+        "401":
+          description: user is not authorized
+  /users/myFamilyRecipes:
+    get:
+      tags:
+      - Users
+      summary: Return the users family recipes
+      description: Get an array of recipes from the user's family recipes
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/FamilyRecipes'
+        "401":
+          description: user is not authorized
+  /users/{recipeId}:
+    get:
+      tags:
+      - Users
+      summary: Return the recipe that was created by the user with this recipeId
+      description: Get the recipe that was created by the logged in user with this recipeId
+      parameters:
+      -recipeId:
+        in: path
+        description: recipe's id
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: integer
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/RecipePreview'
+                  - $ref: '#/components/schemas/FullDisplay'
+        "401":
+          description: user is not authorized
+  /recipes/getRandomRecipes:
+    get:
+      tags:
+      - Recipes
+      summary: Return 3 random recipes
+      description: Get an array of 3 random recipes
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+  /recipes/search:
+    get:
+      tags:
+      - Recipes
+      summary: Return recipes that match the search query
+      description: Get an array of recipes that match the search query
+      parameters:
+      - name: query
+        in: query
+        description: search query
+        required: true
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: number 
+        in: query
+        description: number of recipes to return
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: integer
+        default: 5
+      - name: cuisine
+        in: query
+        description: cuisine type
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: diet
+        in: query
+        description: diet type
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: intolerances
+        in: query
+        description: intolerances type
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      - name: sort
+        in: query
+        description: sort type
+        required: false
+        style: simple
+        explode: false
+        schema:
+          type: string
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/RecipePreview'
+  
+
 components:
   schemas:
     User:
@@ -227,4 +401,58 @@ components:
           type: boolean
           description: indication if the recipe is gluten free
           example: false
+    FamilyRecipes:
+      type: object
+      properties:
+        user_id:
+          type: integer
+          description: user identifier
+          example: 4
+        recipe_id:
+          type: integer
+          description: recipe identifier
+          example: 10
+        family_member:
+          type: string
+          description: family member name
+          example: "grandma"
+        ingredients:
+          type: string
+          description: ingredients of the recipe
+          example: "1 cup of sugar, 2 cups of flour"
+        instructions:
+          type: string
+          description: instructions of the recipe
+          example: "mix the ingredients, bake for 30 minutes"
+        name:
+          type: string
+          description: recipe name
+          example: "grandma's cake"
+        image:
+          type: string
+          description: recipe image
+          format: URL
+          example: grandmas_cake.jpg
+        holiday:
+          type: string
+          description: holiday name
+          example: "Passover"
+    FullDisplay:
+      type: object
+      properties:
+        ingredients:
+          type: string
+          description: ingredients of the recipe
+          example: "1 cup of sugar, 2 cups of flour"
+        instructions:
+          type: string
+          description: instruction
+          example: "mix the ingredients"
+        meals:
+          type: integer
+          description: number of meals
+          example: 4
+
+      
+
   

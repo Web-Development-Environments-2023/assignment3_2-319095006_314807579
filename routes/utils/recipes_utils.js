@@ -59,10 +59,10 @@ async function search(query, number, cuisine, diet, intolerances, sort) {
 async function getRecipeDetails(recipe_id, user_id) {
     let already = false;
     let saved = false;
-    // if (user_id) {
-    //      saved = await user_utils.checkFavorite(user_id, recipe_id);
-    //      already  = await user_utils.checkViewed(user_id, recipe_id);
-    // }
+    if (user_id) {
+         saved = await user_utils.checkFavorite(user_id, recipe_id);
+         already  = await user_utils.checkViewed(user_id, recipe_id);
+    }
   
     let recipe_info = await getRecipeInformation(recipe_id);
     //check if the recipe is in lastviewed table with 
