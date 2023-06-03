@@ -43,12 +43,13 @@ router.post('/favorites', async (req,res,next) => {
 router.get('/favorites', async (req,res,next) => {
   try{
     const user_id = req.session.user_id;
-    let favorite_recipes = {};
+    let favorite_recipes = [];
     const recipes_id = await user_utils.getFavoriteRecipes(user_id);
     let recipes_id_array = [];
     recipes_id.map((element) => recipes_id_array.push(element.recipe_id)); //extracting the recipe ids into array
     for (let i = 0; i < recipes_id_array.length; i++) {
-      favorite_recipes[i] = await recipe_utils.getRecipeDetails(recipes_id_array[i], user_id);
+      let ready= await recipe_utils.getRecipeDetails(recipes_id_array[i], user_id);
+      favorite_recipes.push(ready);
     }
     // const results = await recipe_utils.getRecipeDetails(recipes_id_array, user_id); //--- CHANGED BY US
     res.status(200).send(favorite_recipes);
@@ -57,14 +58,14 @@ router.get('/favorites', async (req,res,next) => {
   }
 });
 
-router.post("/newRecipe", async (req, res, next) => { // it is written in the document to open a modal, but i made it like register for now.
+router.post("/newRecipe", async (req, res, next) => { 
   try {
       let recipe_details = {
         image: req.body.image,
-        name: req.body.name,
-        time: req.body.time,
+        name: req.body.title,
+        time: req.body.readyInMinutes,
         vegan:req.body.vegan,
-        vegeterian:req.body.vegeterian,
+        vegetarian:req.body.vegetarian,
         gluten_free:req.body.gluten_free,
         ingredients : req.body.ingredients, 
         instructions:req.body.instructions,
@@ -84,21 +85,17 @@ router.get("/myRecipes", async (req,res,next)=>{
     const recipes = await user_utils.getMyRecipes(user_id);
     const jsonArray = recipes.map((row) => {
       return {
-        recipe_id: row.recipe_id,
+        id: row.recipe_id,
+        title: row.name,
         image: row.image,
-        name: row.name,
-        time: row.time,
+        readyInMinutes: row.time,
+        popularity: row.popularity,
+        vegetarian: row.vegetarian,
         vegan: row.vegan,
-        gluten_free: row.gluten_free,
-        likes: row.likes,
-        saved: row.saved,
-        already: row.already,
-        ingredients: row.ingredients,
-        instructions: row.instructions,
-        meals: row.meals
+        gluten_free: row.gluten_free     
       };
     });
-    res.status(200).send(recipes);
+    res.status(200).send(jsonArray);
   }catch(error){
     next(error)
   }
@@ -109,6 +106,9 @@ router.get("/lastViewed", async (req,res,next)=>{
   try {
     const user_id= req.session.user_id;
     const recipes = await user_utils.getLastViewed(user_id);
+    if (recipes.length == 0) {
+      res.status(200).send("No recipes found");
+    }
     //get details for each of the ids in recipes
     for (let i = 0; i < recipes.length; i++) {
         const recipe = await recipe_utils.getRecipeDetails(recipes[i].recipe_id, user_id);
@@ -125,19 +125,6 @@ router.get("/myFamilyRecipes", async (req,res,next)=>{
   try{
     const user_id = req.session.user_id;
     const recipes = await user_utils.getMyFamilyRecipes(user_id);
-    const jsonArray = recipes.map((row) => {
-      return {
-        recipe_id: row.recipe_id,
-        user_id: row.user_id,
-        name: row.name,
-        time: row.time,
-        ingredients: row.ingredients,
-        instructions: row.instructions,
-        holiday: row.holiday,
-        family_member: row.family_member,
-        image: row.image
-      };
-    });
     res.status(200).send(recipes);
   }catch(error){
     next(error)
@@ -148,10 +135,29 @@ router.get("/myFamilyRecipes", async (req,res,next)=>{
 router.get("/:recipeId", async (req, res, next) => {
   try {
     const recipe = await user_utils.getFullRecipeDetails(req.params.recipeId);
+    if (recipe.length == 0) {
+      res.status(200).send("No recipes found");
+    }
+    const jsonArray = recipe.map((row) => {
+      return {
+        id: row.recipe_id,
+        title: row.name,
+        image: row.image,
+        readyInMinutes: row.time,
+        popularity: row.popularity,
+        vegetarian: row.vegetarian,
+        vegan: row.vegan,
+        gluten_free: row.gluten_free,
+        saved: row.saved,
+        ingredients: row.ingredients,
+        instructions: row.instruction,
+        meals: row.meals
+      };
+    });
     if (req.session && req.session.user_id) {
       await user_utils.changeLastViewed(req.session.user_id, req.params.recipeId);
     }
-    res.status(200).send(recipe);
+    res.status(200).send(jsonArray);
   } 
   catch(error){
     next(error);

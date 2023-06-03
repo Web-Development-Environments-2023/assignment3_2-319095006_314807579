@@ -71,14 +71,14 @@ async function getRecipeDetails(recipe_id, user_id) {
     return {
         id: id,
         title: title,
-        readyInMinutes: readyInMinutes,
         image: image,
+        readyInMinutes: readyInMinutes,
         popularity: aggregateLikes,
-        vegan: vegan,
         vegetarian: vegetarian,
-        glutenFree: glutenFree,
-        already: already,
-        saved: saved
+        vegan: vegan,
+        gluten_free: glutenFree,
+        viewed: already,
+        favorite: saved
     }
 }
 
@@ -90,15 +90,18 @@ async function getFullRecipeDetails(recipe_id) {
     return {
         id: id,
         title: title,
-        readyInMinutes: readyInMinutes,
         image: image,
+        readyInMinutes: readyInMinutes,
         popularity: aggregateLikes,
-        vegan: vegan,
         vegetarian: vegetarian,
-        glutenFree: glutenFree,
-        servings: servings,
-        ingredients: extendedIngredients.map((ing) => ing.original),
-        instructions: instructions
+        vegan: vegan,
+        gluten_free: glutenFree,
+        //for each extendedIngredient we want to take combine the original into one string
+        ingredients: extendedIngredients.map((ing) => ing.original).join(", "),
+        // .map((ing) => ing.original)
+        instructions: instructions,
+        meals: servings
+
     }
 }
 

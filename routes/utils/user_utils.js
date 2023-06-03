@@ -2,7 +2,6 @@ const DButils = require("./DButils");
 
 async function markAsFavorite(user_id, recipe_id){
     await DButils.execQuery(`insert into FavoriteRecipes values ('${user_id}',${recipe_id})`);
-    await DButils.execQuery(`update myrecipes set saved='true' where recipe_id='${recipe_id}' and user_id='${user_id}'`);
 }
 
 async function getFavoriteRecipes(user_id){
@@ -23,7 +22,7 @@ async function getMyFamilyRecipes(user_id){
 async function createRecipe(recipe_details,user_id){
     console.log(recipe_details);
     await DButils.execQuery(
-    `INSERT INTO myrecipes VALUES ('${user_id}',NULL,'${recipe_details.image}', '${recipe_details.name}', '${recipe_details.time}', 0, '${recipe_details.vegan}', '${recipe_details.gluten_free}','false', 'false','${recipe_details.ingredients}','${recipe_details.instructions}','${recipe_details.meals}', '${recipe_details.vegeterian}')`);
+    `INSERT INTO myrecipes VALUES ('${user_id}',NULL,'${recipe_details.image}', '${recipe_details.name}', '${recipe_details.time}', 0, '${recipe_details.vegan}', '${recipe_details.gluten_free}','false','${recipe_details.ingredients}','${recipe_details.instructions}','${recipe_details.meals}', '${recipe_details.vegetarian}')`);
 }
 
 
