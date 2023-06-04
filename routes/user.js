@@ -109,12 +109,14 @@ router.get("/lastViewed", async (req,res,next)=>{
     if (recipes.length == 0) {
       res.status(200).send("No recipes found");
     }
-    //get details for each of the ids in recipes
-    for (let i = 0; i < recipes.length; i++) {
-        const recipe = await recipe_utils.getRecipeDetails(recipes[i].recipe_id, user_id);
-        recipes[i] = recipe;
+    else {
+      //get details for each of the ids in recipes
+      for (let i = 0; i < recipes.length; i++) {
+          const recipe = await recipe_utils.getRecipeDetails(recipes[i].recipe_id, user_id);
+          recipes[i] = recipe;
+      }
+      res.status(200).send(recipes);
     }
-    res.status(200).send(recipes);
   } catch (error) {
     next(error);
   }
@@ -125,7 +127,12 @@ router.get("/myFamilyRecipes", async (req,res,next)=>{
   try{
     const user_id = req.session.user_id;
     const recipes = await user_utils.getMyFamilyRecipes(user_id);
+    if (recipes.length == 0) {
+      res.status(200).send("No recipes found");
+    }
+    else{
     res.status(200).send(recipes);
+    }
   }catch(error){
     next(error)
   }
@@ -138,6 +145,7 @@ router.get("/:recipeId", async (req, res, next) => {
     if (recipe.length == 0) {
       res.status(200).send("No recipes found");
     }
+    else {
     const jsonArray = recipe.map((row) => {
       return {
         id: row.recipe_id,
@@ -158,6 +166,7 @@ router.get("/:recipeId", async (req, res, next) => {
       await user_utils.changeLastViewed(req.session.user_id, req.params.recipeId);
     }
     res.status(200).send(jsonArray);
+  }
   } 
   catch(error){
     next(error);
