@@ -9,17 +9,41 @@ const req = require("express/lib/request");
  * Authenticate all incoming requests by middleware
  */
 router.use(async function (req, res, next) {
-  if (req.session && req.session.user_id) {
-    DButils.execQuery("SELECT user_id FROM users").then((users) => {
-      if (users.find((x) => x.user_id === req.session.user_id)) {
-        req.user_id = req.session.user_id;
-        next();
-      }
-    }).catch(err => next(err));
+  console.log("session: ", req.session);
+  console.log("session id: ", req.session.id);
+  if (req.session && (req.body.username || req.session.user_id)) {
+    if (req.body.username){
+      DButils.execQuery("SELECT username, user_id FROM users").then((users) => {
+        const user = users.find((x) => x.username === req.body.username);
+        if (user) {
+          req.session.user_id = user.user_id; // Save the user_id in the session
+          next();
+        } 
+      }).catch(err => next(err));
+    }
+    else{
+      DButils.execQuery("SELECT username, user_id FROM users").then((users) => {
+        if (users.find((x) => x.user_id === req.session.user_id)){
+          req.user_id = req.session.user_id; 
+          next();
+        } 
+      }).catch(err=>next(err));
+    }
   } else {
     res.sendStatus(401);
   }
-});
+});  
+//   if (req.session && req.session.user_id) {
+//     DButils.execQuery("SELECT username, user_id FROM users").then((users) => {
+//       if (users.find((x) => x.user_id === req.session.user_id)) {
+//         req.user_id =req.sessin.user_id;
+//         next();
+//       }
+//     }).catch(err => next(err));
+//   } else {
+//     res.sendStatus(401);
+//   }
+// });
 
 
 /**
