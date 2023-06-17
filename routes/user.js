@@ -11,10 +11,12 @@ const req = require("express/lib/request");
 router.use(async function (req, res, next) {
   console.log("session: ", req.session);
   console.log("session id: ", req.session.id);
-  if (req.session && (req.body.username || req.session.user_id)) {
-    if (req.body.username){
+  console.log("body", req.body.username);
+  console.log("params", req.query.username);
+  if (req.session && (req.body.username || req.session.user_id|| req.query.username)) {
+    if (req.body.username || req.query.username){
       DButils.execQuery("SELECT username, user_id FROM users").then((users) => {
-        const user = users.find((x) => x.username === req.body.username);
+        const user = users.find((x) => x.username === req.body.username || x.username ===req.query.username);
         if (user) {
           req.session.user_id = user.user_id; // Save the user_id in the session
           next();
@@ -106,6 +108,7 @@ router.post("/newRecipe", async (req, res, next) => {
 router.get("/myRecipes", async (req,res,next)=>{
   try{
     const user_id = req.session.user_id;
+    console.log(req.session.user_id)
     const recipes = await user_utils.getMyRecipes(user_id);
     const jsonArray = recipes.map((row) => {
       return {
