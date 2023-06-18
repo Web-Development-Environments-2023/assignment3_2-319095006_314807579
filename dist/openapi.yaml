@@ -111,6 +111,29 @@ paths:
           description: user is not authorized
       security:
       - cookieAuth: []
+  /users/addLastViewed:
+    post:
+      tags:
+      - Users
+      summary: save recipe in the last viewed list of a user
+      description: save recipe in the last viewed list of a user
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                recipeId:
+                  type: string
+                  description: reciepe's id which the user saved
+                  example: 716429
+      responses:
+        "200":
+          description: The Recipe successfully saved as last viewed
+        "401":
+          description: user is not authorized
+      security:
+      - cookieAuth: []
   /recipes/{recipeId}:
     get:
       tags:

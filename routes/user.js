@@ -63,6 +63,21 @@ router.post('/favorites', async (req,res,next) => {
   }
 })
 
+router.post('/addLastViewed', async (req,res,next) =>{
+  try{
+    console.log("inside lastViewed")
+    const user_id = req.session.user_id;
+    const recipe_id = req.body.recipeId;
+    console.log("user_id",user_id)
+    await user_utils.addLastViewed(user_id,recipe_id);
+    res.status(201).send("The Recipe successfully saved as lastViewed");
+  }
+  catch(error){
+    next(error)
+  }
+})
+
+
 /**
  * This path returns the favorites recipes that were saved by the logged-in user
  */
